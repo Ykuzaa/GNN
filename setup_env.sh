@@ -1,22 +1,29 @@
 #!/bin/bash
-# Crée l'environnement du TP GNN (PyTorch 2.4 + DGL 2.4, CUDA 12.4)
+# Crée l'environnement du TP GNN sur CPU (PyTorch 2.1.1 + DGL 1.1.3, comme le script du prof)
 set -e
 
-# venv Python 3.11 (même version que le notebook du prof)
-uv venv venv --python 3.11
+# data.dgl.ai ne répond plus : on prend les datasets sur le bucket officiel de DGL
+DGL_REPO=https://dgl-data.s3-us-west-2.amazonaws.com/
+
+# venv Python 3.10
+uv venv venv --python 3.10
 source venv/bin/activate
 
-# PyTorch GPU (CUDA 12.4)
-uv pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cu124
-
-# DGL GPU, compilé pour torch 2.4 + CUDA 12.4
-uv pip install dgl==2.4.0 --find-links https://data.dgl.ai/wheels/torch-2.4/cu124/repo.html
-
-# le reste
+# PyTorch CPU puis DGL et le reste
+uv pip install "torch==2.1.1+cpu" --index-url https://download.pytorch.org/whl/cpu
 uv pip install -r requirements.txt
 
-# kernel Jupyter
-python -m ipykernel install --user --name gnn_dgl --display-name "GNN DGL (GPU)"
+# PubMed n'est plus sur le bucket : on récupère les fichiers d'origine (Planetoid)
+# et on les met là où DGL les cherche (dossier nommé avec un hash de l'URL)
+h=$(printf '%s' "${DGL_REPO}dataset/pubmed.zip" | sha1sum | cut -c1-8)
+mkdir -p ~/.dgl/pubmed_$h
+for s in x y tx ty allx ally graph test.index; do
+    curl -sSfL -o ~/.dgl/pubmed_$h/ind.pubmed.$s \
+        https://raw.githubusercontent.com/kimiyoung/planetoid/master/data/ind.pubmed.$s
+done
 
-# vérification rapide (pas d'entraînement)
-python -c "import torch, dgl; print('torch', torch.__version__, '| dgl', dgl.__version__, '| GPU :', torch.cuda.is_available())"
+# kernel Jupyter avec les bonnes variables
+python -m ipykernel install --user --name gnn_dgl --display-name "GNN DGL" \
+    --env DGLBACKEND pytorch --env DGL_REPO $DGL_REPO
+
+python -c "import torch, dgl; print('torch', torch.__version__, '| dgl', dgl.__version__)"

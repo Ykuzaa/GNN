@@ -5,23 +5,23 @@ Classification de noeuds sur Cora (et PubMed en bonus) avec GCN, GraphSAGE et GA
 - `TP_GNN.ipynb` : sujet du TP
 - `TP_GNN_complete.ipynb` : TP complété (réponses aux questions + code)
 
-## Installation (GPU)
+## Installation (CPU)
 
-Il faut [uv](https://docs.astral.sh/uv/) et un driver NVIDIA récent.
+Il faut [uv](https://docs.astral.sh/uv/) (`pip install uv`).
 
 ```bash
 bash setup_env.sh
 ```
 
-Le script crée `venv/` (Python 3.11, PyTorch 2.4 CUDA 12.4, DGL 2.4 CUDA 12.4) et le kernel Jupyter **GNN DGL (GPU)**.
+Le script crée `venv/` (Python 3.10, PyTorch 2.1.1 CPU, DGL 1.1.3) et le kernel Jupyter **GNN DGL**.
 
-Sans GPU : remplacer `cu124` par `cpu` dans les deux URL de `setup_env.sh`. Le notebook utilise le GPU automatiquement s'il est disponible.
+Remarque : le site `data.dgl.ai` ne répond plus. Le script fait donc télécharger Cora depuis le bucket officiel de DGL (variable `DGL_REPO`) et PubMed depuis les fichiers d'origine Planetoid.
 
 ## Lancer
 
 ```bash
 source venv/bin/activate
-jupyter notebook TP_GNN_complete.ipynb
+jupyter lab
 ```
 
-Les datasets (Cora, PubMed) sont téléchargés automatiquement par DGL au premier lancement (dans `~/.dgl/`).
+Puis ouvrir `TP_GNN_complete.ipynb` avec le kernel **GNN DGL**.
