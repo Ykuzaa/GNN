@@ -1,0 +1,14 @@
+# torch et dgl (version GPU) sont installés par setup_env.sh
+numpy<2
+scipy
+pandas
+matplotlib
+scikit-learn
+networkx
+pydantic
+pyyaml
+psutil
+tqdm
+requests
+ipykernel
+jupyter
